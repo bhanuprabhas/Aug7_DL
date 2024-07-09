@@ -1,0 +1,41 @@
+import heapq
+
+def calculate_beauty(sequence):
+    return len(set(sequence))
+
+def max_beauty_sum(A, K):
+    max_heap = [(-calculate_beauty(A), A)]
+    beauty_sum = calculate_beauty(A)
+
+    for _ in range(K):
+        if not max_heap:
+            break
+        current_beauty, sequence = heapq.heappop(max_heap)
+        current_beauty = -current_beauty
+
+        best_split_increase = 0
+        best_left, best_right = None, None
+        
+        for i in range(1, len(sequence)):
+            left, right = sequence[:i], sequence[i:]
+            new_beauty = calculate_beauty(left) + calculate_beauty(right)
+            increase = new_beauty - current_beauty
+            
+            if increase > best_split_increase:
+                best_split_increase = increase
+                best_left, best_right = left, right
+        
+        if best_split_increase == 0:
+            break
+        
+        beauty_sum += best_split_increase
+        heapq.heappush(max_heap, (-calculate_beauty(best_left), best_left))
+        heapq.heappush(max_heap, (-calculate_beauty(best_right), best_right))
+
+    return beauty_sum
+
+# Example test case
+N = 6
+K = 2
+A = [1, 2, 3, 4, 2, 4]
+print(max_beauty_sum(A, K))  # Expected Output: 6
