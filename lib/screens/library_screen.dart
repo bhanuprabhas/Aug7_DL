@@ -1,9 +1,10 @@
+import 'package:fllutter/widgets/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
-import '../widgets/searchBar.dart'; // Adjusted import path
-import 'bookDetailScreen.dart'; // Import your BookDetailScreen file here
+import '../widgets/searchBar.dart';
+import 'bookDetailScreen.dart';
 
 class LibraryScreen extends StatefulWidget {
   @override
@@ -79,10 +80,12 @@ class _LibraryScreenState extends State<LibraryScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.backgroundColor,
       appBar: AppBar(
-        title:
-            Text('Digital Library @rcts', style: TextStyle(color: Colors.red)),
+        title: Text('Digital Library @rcts',
+            style: TextStyle(color: AppColors.textColor)),
         centerTitle: false,
+        backgroundColor: AppColors.backgroundColor,
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -104,85 +107,138 @@ class _LibraryScreenState extends State<LibraryScreen> {
               ),
             ),
             if (!isSearching)
-              Column(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Text(
-                      'Popular Reads',
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 50.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(
+                        'Popular Reads',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.textColor,
+                        ),
                       ),
                     ),
-                  ),
-                  SizedBox(
-                    height: 200, // Adjust height as needed
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 50.0),
+                    SizedBox(
+                      height: 200,
                       child: ListView.builder(
                         scrollDirection: Axis.horizontal,
                         itemCount: topReads.length,
                         itemBuilder: (context, index) {
                           final book = topReads[index];
-                          return buildTopReadCard(book); // Use common method
+                          return buildTopReadCard(book);
                         },
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
+            const Padding(
+              padding: EdgeInsets.all(8.0),
               child: Text(
                 'Books from library',
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
+                  color: AppColors.textColor,
                 ),
               ),
             ),
-            Container(
-              height: MediaQuery.of(context)
-                  .size
-                  .height, // Set a fixed height for the GridView
-              child: isLoading
-                  ? Center(child: CircularProgressIndicator())
-                  : Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 50.0),
-                      child: GridView.builder(
-                        shrinkWrap: true,
-                        physics:
-                            NeverScrollableScrollPhysics(), // Disable GridView scrolling
-                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 6, // Number of cards per row
-                          crossAxisSpacing: 8.0,
-                          mainAxisSpacing: 20.0,
-                          childAspectRatio:
-                              0.7, // Adjust aspect ratio as needed
-                        ),
-                        itemCount:
-                            isSearching ? searchResults.length : books.length,
-                        itemBuilder: (context, index) {
-                          final book =
-                              isSearching ? searchResults[index] : books[index];
-                          return buildBookCard(book); // Use common method
-                        },
-                      ),
-                    ),
-            ),
+            // Display general list of books
+            if (!isLoading)
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 50.0),
+                child: GridView.builder(
+                  shrinkWrap: true,
+                  physics: NeverScrollableScrollPhysics(),
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 6,
+                    crossAxisSpacing: 8.0,
+                    mainAxisSpacing: 20.0,
+                    childAspectRatio: 0.7,
+                  ),
+                  itemCount: isSearching ? searchResults.length : books.length,
+                  itemBuilder: (context, index) {
+                    final book =
+                        isSearching ? searchResults[index] : books[index];
+                    return buildBookCard(book);
+                  },
+                ),
+              ),
+            // Display books grouped by subjects
+            if (!isLoading) ...buildSubjectBlocks(),
           ],
         ),
       ),
     );
   }
 
-//card inside styles for the allbooks and the topreads
+  // Method to build subject blocks dynamically
+  List<Widget> buildSubjectBlocks() {
+    // Extract all unique subjects from books list
+    Set<String> uniqueSubjects = Set<String>();
+    books.forEach((book) {
+      uniqueSubjects.add(book['subject']);
+    });
+
+    // Create a list of widgets for each subject
+    List<Widget> subjectBlocks = [];
+    uniqueSubjects.forEach((subject) {
+      subjectBlocks.add(buildSubjectBlock(subject));
+    });
+
+    return subjectBlocks;
+  }
+
+  // Method to build a subject block for a specific subject
+  Widget buildSubjectBlock(String subject) {
+    // Filter books by the specified subject
+    List<dynamic> booksBySubject =
+        books.where((book) => book['subject'] == subject).toList();
+
+    // Return a column with the subject title and a horizontal list view of books
+    return booksBySubject.isNotEmpty
+        ? Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 50.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text(
+                    subject,
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.textColor,
+                    ),
+                  ),
+                ),
+                SizedBox(
+                  height: 200,
+                  child: ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: booksBySubject.length,
+                    itemBuilder: (context, index) {
+                      final book = booksBySubject[index];
+                      return buildBookCard(book);
+                    },
+                  ),
+                ),
+              ],
+            ),
+          )
+        : SizedBox(); // Return empty SizedBox if no books found for the subject
+  }
 
   Widget buildBookCard(dynamic book) {
     return Card(
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(0), // Adjust the border radius here
+        borderRadius: BorderRadius.circular(0),
       ),
       margin: EdgeInsets.all(8),
       color: Colors.white,
@@ -196,8 +252,8 @@ class _LibraryScreenState extends State<LibraryScreen> {
           );
         },
         child: Container(
-          width: 120, // Adjust width as needed
-          height: 250, // Adjust height to match the top read cards
+          width: 120,
+          height: 250,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
@@ -242,7 +298,7 @@ class _LibraryScreenState extends State<LibraryScreen> {
   Widget buildTopReadCard(dynamic book) {
     return Card(
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(0), // Adjust the border radius here
+        borderRadius: BorderRadius.circular(0),
       ),
       margin: EdgeInsets.all(8),
       child: InkWell(
@@ -255,7 +311,7 @@ class _LibraryScreenState extends State<LibraryScreen> {
           );
         },
         child: Container(
-          width: 120, // Adjust width as needed
+          width: 120,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[

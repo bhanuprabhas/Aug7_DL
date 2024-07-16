@@ -32,12 +32,16 @@ dependencies:
     sdk: flutter
   http: ^1.2.1
   shared_preferences: ^2.0.6
+  #flutter_aws_s3_client: ^1.1.0
+  aws_signature_v4: ^0.5.2
   syncfusion_flutter_pdfviewer: ^26.1.40 #for pdf viewer
+  path_provider: ^2.0.9
 
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.2
+  font_awesome_flutter: ^10.7.0
 
 dev_dependencies:
   flutter_test:

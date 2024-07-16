@@ -1,3 +1,4 @@
+import 'package:fllutter/widgets/colors.dart';
 import 'package:flutter/material.dart';
 
 class Search_Bar extends StatefulWidget {
@@ -56,9 +57,12 @@ class _Search_BarState extends State<Search_Bar> {
         children: [
           Expanded(
             child: TextField(
+              cursorColor: Colors.white,
               controller: _searchController,
+              style: TextStyle(color: AppColors.textColor),
               decoration: InputDecoration(
                 hintText: 'Search',
+                prefixIconColor: AppColors.iconColor,
                 prefixIcon: Icon(Icons.search),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8.0),
