@@ -1,5 +1,5 @@
-import 'package:fllutter/widgets/colors.dart';
 import 'package:flutter/material.dart';
+import '../widgets/colors.dart';
 
 class Search_Bar extends StatefulWidget {
   final Function(List<dynamic>) onSearchResults;
@@ -19,8 +19,10 @@ class Search_Bar extends StatefulWidget {
 class _Search_BarState extends State<Search_Bar> {
   final TextEditingController _searchController = TextEditingController();
   String _searchType = 'inTitle';
+  bool _isTextFieldFocused = false;
   bool _isDropdownFocused = false;
 
+  // In Search_Bar class
   void _searchBooks(String keyword) {
     List<dynamic> searchResults = widget.books.where((book) {
       String fieldToSearch = '';
@@ -56,53 +58,109 @@ class _Search_BarState extends State<Search_Bar> {
       child: Row(
         children: [
           Expanded(
-            child: TextField(
-              cursorColor: Colors.white,
-              controller: _searchController,
-              style: TextStyle(color: AppColors.textColor),
-              decoration: InputDecoration(
-                hintText: 'Search',
-                prefixIconColor: AppColors.iconColor,
-                prefixIcon: Icon(Icons.search),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8.0),
+            child: Focus(
+              onFocusChange: (isFocused) {
+                widget.onFocusChange(isFocused);
+                setState(() {
+                  _isTextFieldFocused = isFocused;
+                });
+              },
+              child: MouseRegion(
+                onEnter: (_) {
+                  setState(() {
+                    _isTextFieldFocused = true;
+                  });
+                },
+                onExit: (_) {
+                  setState(() {
+                    _isTextFieldFocused = false;
+                  });
+                },
+                child: Container(
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      color: _isTextFieldFocused
+                          ? Colors.blue
+                          : Colors.transparent,
+                      width: 2.0,
+                    ),
+                  ),
+                  child: TextField(
+                    cursorColor: Colors.white,
+                    controller: _searchController,
+                    style: TextStyle(color: AppColors.textColor),
+                    decoration: InputDecoration(
+                      hintText: 'Search',
+                      prefixIconColor: AppColors.iconColor,
+                      prefixIcon: Icon(Icons.search),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8.0),
+                      ),
+                    ),
+                    onChanged: (value) {
+                      _searchBooks(value);
+                    },
+                  ),
                 ),
               ),
-              onChanged: (value) {
-                _searchBooks(value);
-              },
             ),
           ),
           Padding(
             padding: const EdgeInsets.all(15.0),
-            child: DropdownButton<String>(
-              value: _searchType,
-              onChanged: (String? newValue) {
+            child: Focus(
+              onFocusChange: (isFocused) {
+                widget.onFocusChange(isFocused);
                 setState(() {
-                  _searchType = newValue!;
-                });
-                _searchBooks(_searchController.text);
-              },
-              items: <String>[
-                'inTitle',
-                'inAuthor',
-                'inPublisher',
-                'inISBN',
-                'inSubject'
-              ].map<DropdownMenuItem<String>>((String value) {
-                return DropdownMenuItem<String>(
-                  value: value,
-                  child: Text(value),
-                );
-              }).toList(),
-              // FocusNode and onTap for managing focus
-              focusNode: FocusNode(),
-              onTap: () {
-                widget.onFocusChange(true); // Notify parent of focus change
-                setState(() {
-                  _isDropdownFocused = true;
+                  _isDropdownFocused = isFocused;
                 });
               },
+              child: MouseRegion(
+                onEnter: (_) {
+                  setState(() {
+                    _isDropdownFocused = true;
+                  });
+                },
+                onExit: (_) {
+                  setState(() {
+                    _isDropdownFocused = false;
+                  });
+                },
+                child: Container(
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      color:
+                          _isDropdownFocused ? Colors.blue : Colors.transparent,
+                      width: 2.0,
+                    ),
+                  ),
+                  child: DropdownButton<String>(
+                    value: _searchType,
+                    onChanged: (String? newValue) {
+                      setState(() {
+                        _searchType = newValue!;
+                      });
+                      _searchBooks(_searchController.text);
+                    },
+                    items: <String>[
+                      'inTitle',
+                      'inAuthor',
+                      'inPublisher',
+                      'inISBN',
+                      'inSubject'
+                    ].map<DropdownMenuItem<String>>((String value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: Text(value),
+                      );
+                    }).toList(),
+                    focusNode: FocusNode(),
+                    onTap: () {
+                      widget
+                          .onFocusChange(true); // Notify parent of focus change
+                    },
+                  ),
+                ),
+              ),
             ),
           ),
         ],

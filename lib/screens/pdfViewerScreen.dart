@@ -1,58 +1,70 @@
 import 'dart:convert';
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import '../widgets/colors.dart';
+
+
+
 
 class PdfViewerPage extends StatefulWidget {
   final String isbn;
+  final int initialPage;
 
-  PdfViewerPage({required this.isbn});
+  PdfViewerPage({required this.isbn, this.initialPage = 0});
 
   @override
   _PdfViewerPageState createState() => _PdfViewerPageState();
 }
 
 class _PdfViewerPageState extends State<PdfViewerPage> {
-  String? localFilePath;
+  String? _presignedUrl;
   int _currentPage = 0;
   int _totalPages = 0;
   bool _isLoading = true;
 
   PdfViewerController pdfViewerController = PdfViewerController();
-  bool _isPdfViewerFocused = false;
+  bool _isPdfViewerFocused = true;
 
-  // FocusNode for managing focus on AppBar
-  late FocusNode _appBarFocusNode;
+  late FocusNode _zoomInFocusNode;
+  late FocusNode _zoomOutFocusNode;
+  late FocusNode _pageJumpFocusNode;
+  late FocusNode _searchFocusNode;
 
   @override
   void initState() {
     super.initState();
+    _zoomInFocusNode = FocusNode();
+    _zoomOutFocusNode = FocusNode();
+    _pageJumpFocusNode = FocusNode();
+    _searchFocusNode = FocusNode();
     _initializePdfViewer();
-    _appBarFocusNode = FocusNode();
   }
 
   @override
   void dispose() {
-    _appBarFocusNode.dispose();
+    _zoomInFocusNode.dispose();
+    _zoomOutFocusNode.dispose();
+    _pageJumpFocusNode.dispose();
+    _searchFocusNode.dispose();
     super.dispose();
   }
 
   Future<void> _initializePdfViewer() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? username = prefs.getString('username');
-    if (username != null) {
-      String presignedUrl = await _getPresignedUrl(username, widget.isbn);
-      if (presignedUrl.isNotEmpty) {
-        await downloadFile(presignedUrl);
-      } else {
-        setState(() {
-          _isLoading = false;
-        });
-      }
+    String username = prefs.getString('username') ?? 'hariuser';
+    String presignedUrl = await _getPresignedUrl(username, widget.isbn);
+    if (presignedUrl.isNotEmpty) {
+      setState(() {
+        _presignedUrl = presignedUrl;
+        _isLoading = false;
+      });
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (pdfViewerController != null) {
+          pdfViewerController.jumpToPage(widget.initialPage);
+        }
+      });
     } else {
       setState(() {
         _isLoading = false;
@@ -72,31 +84,6 @@ class _PdfViewerPageState extends State<PdfViewerPage> {
     } else {
       print('Failed to get presigned URL: ${response.statusCode}');
       return '';
-    }
-  }
-
-  Future<void> downloadFile(String presignedUrl) async {
-    try {
-      final response = await http.get(Uri.parse(presignedUrl));
-      if (response.statusCode == 200) {
-        final Directory dir = await getApplicationDocumentsDirectory();
-        final file = File('${dir.path}/downloaded_pdf.pdf');
-        await file.writeAsBytes(response.bodyBytes);
-        setState(() {
-          localFilePath = file.path;
-          _isLoading = false;
-        });
-      } else {
-        print('Failed to download file: ${response.statusCode}');
-        setState(() {
-          _isLoading = false;
-        });
-      }
-    } catch (e) {
-      print('Error downloading file: $e');
-      setState(() {
-        _isLoading = false;
-      });
     }
   }
 
@@ -137,6 +124,9 @@ class _PdfViewerPageState extends State<PdfViewerPage> {
                     _currentPage = pageNumber - 1;
                   });
                   pdfViewerController.jumpToPage(pageNumber - 1);
+                  SharedPreferences.getInstance().then((prefs) {
+                    prefs.setInt('${widget.isbn}_last_viewed_page', pageNumber - 1);
+                  });
                 } else {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
@@ -156,7 +146,6 @@ class _PdfViewerPageState extends State<PdfViewerPage> {
 
   void _performSearch(String searchTerm) {
     if (searchTerm.isNotEmpty) {
-      // Implement your search logic here
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Searching for: $searchTerm'),
@@ -166,103 +155,156 @@ class _PdfViewerPageState extends State<PdfViewerPage> {
   }
 
   void _zoomIn() {
-    // Increase the zoom level
-    pdfViewerController.zoomLevel = pdfViewerController.zoomLevel + 0.5;
+    final currentZoom = pdfViewerController.zoomLevel;
+    pdfViewerController.zoomLevel = (currentZoom + 0.5).clamp(1.0, 5.0);
   }
 
   void _zoomOut() {
-    // Decrease the zoom level
-    pdfViewerController.zoomLevel = pdfViewerController.zoomLevel - 0.5;
+    final currentZoom = pdfViewerController.zoomLevel;
+    pdfViewerController.zoomLevel = (currentZoom - 0.5).clamp(1.0, 5.0);
+  }
+
+  Future<bool> _onWillPop() async {
+    if (_isPdfViewerFocused) {
+      FocusScope.of(context).requestFocus(_zoomInFocusNode);
+      _isPdfViewerFocused = false;
+      setState(() {});
+      return false;
+    } else if (_zoomInFocusNode.hasFocus ||
+        _zoomOutFocusNode.hasFocus ||
+        _pageJumpFocusNode.hasFocus ||
+        _searchFocusNode.hasFocus) {
+      bool exitApp = await _showExitDialog();
+      if (exitApp) {
+        return true;
+      } else {
+        FocusScope.of(context).requestFocus(_zoomInFocusNode);
+        setState(() {});
+        return false;
+      }
+    } else {
+      FocusScope.of(context).requestFocus(_zoomInFocusNode);
+      _isPdfViewerFocused = false;
+      setState(() {});
+      return false;
+    }
+  }
+
+  Future<bool> _showExitDialog() async {
+    return await showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: Text('Exit PDF Viewer'),
+            content: Text('Are you sure you want to exit the PDF viewer?'),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(false),
+                child: Text('No'),
+              ),
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(true),
+                child: Text('Yes'),
+              ),
+            ],
+          ),
+        ) ??
+        false;
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.grey[200],
-      appBar: AppBar(
-        backgroundColor: Colors.grey[200],
-        title: Text(
-          'PDF Viewer',
-          style: TextStyle(color: Colors.black),
-        ),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.zoom_in),
-            onPressed: _zoomIn,
-          ),
-          IconButton(
-            icon: Icon(Icons.zoom_out),
-            onPressed: _zoomOut,
-          ),
-          IconButton(
-            icon: Icon(FontAwesomeIcons.solidFilePdf),
-            color: _isPdfViewerFocused ? Colors.red : Colors.black,
-            onPressed: () {
-              _showPageJumpDialog(context);
-            },
-          ),
-          IconButton(
-            icon: Icon(Icons.search),
-            color: _isPdfViewerFocused ? Colors.red : Colors.black,
-            onPressed: () {
-              _performSearch('');
-            },
-          ),
-        ],
-      ),
-      body: Center(
-        child: _isLoading
-            ? CircularProgressIndicator()
-            : GestureDetector(
-                onTap: () {
-                  setState(() {
-                    _isPdfViewerFocused = true;
-                    FocusScope.of(context).requestFocus(_appBarFocusNode);
-                  });
+    return WillPopScope(
+      onWillPop: _onWillPop,
+      child: Scaffold(
+        backgroundColor: AppColors.backgroundColor,
+        appBar: AppBar(
+          backgroundColor: AppColors.backgroundColor,
+          leading: Icon(Icons.arrow_back, color: Colors.white),
+          title: Text('PDF Viewer', style: TextStyle(color: AppColors.textColor)),
+          actions: [
+            Focus(
+              focusNode: _zoomInFocusNode,
+              child: Builder(
+                builder: (context) {
+                  final isFocused = Focus.of(context).hasFocus;
+                  return IconButton(
+                    icon: Icon(Icons.zoom_in, color: isFocused ? Colors.blue : Colors.white),
+                    onPressed: _zoomIn,
+                  );
                 },
-                child: Container(
-                  decoration: BoxDecoration(
-                    border: Border.all(
-                      color: _isPdfViewerFocused ? Colors.red : Colors.transparent,
-                      width: 2.0,
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: _isPdfViewerFocused ? Colors.red.withOpacity(0.5) : Colors.transparent,
-                        spreadRadius: 2,
-                        blurRadius: 4,
-                        offset: Offset(0, 2),
-                      ),
-                    ],
-                  ),
-                  child: SfPdfViewer.file(
-                    File(localFilePath!),
-                    controller: pdfViewerController,
-                    onPageChanged: (PdfPageChangedDetails details) {
-                      setState(() {
-                        _currentPage = details.newPageNumber;
-                      });
-                    },
-                    onDocumentLoaded: (PdfDocumentLoadedDetails details) {
-                      setState(() {
-                        _totalPages = details.document.pages.count;
-                      });
-                    },
-                    onDocumentLoadFailed:
-                        (PdfDocumentLoadFailedDetails details) {
-                      print('Document load failed: ${details.error}');
-                    },
-                  ),
-                ),
               ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          _showPageJumpDialog(context);
-        },
-        tooltip: 'Jump to Page',
-        child: Icon(Icons.forward),
+            ),
+            Focus(
+              focusNode: _zoomOutFocusNode,
+              child: Builder(
+                builder: (context) {
+                  final isFocused = Focus.of(context).hasFocus;
+                  return IconButton(
+                    icon: Icon(Icons.zoom_out, color: isFocused ? Colors.blue : Colors.white),
+                    onPressed: _zoomOut,
+                  );
+                },
+              ),
+            ),
+            Focus(
+              focusNode: _pageJumpFocusNode,
+              child: Builder(
+                builder: (context) {
+                  final isFocused = Focus.of(context).hasFocus;
+                  return IconButton(
+                    icon: Icon(Icons.arrow_forward, color: isFocused ? Colors.blue : Colors.white),
+                    onPressed: () => _showPageJumpDialog(context),
+                  );
+                },
+              ),
+            ),
+            Focus(
+              focusNode: _searchFocusNode,
+              child: Builder(
+                builder: (context) {
+                  final isFocused = Focus.of(context).hasFocus;
+                  return IconButton(
+                    icon: Icon(Icons.search, color: isFocused ? Colors.blue : Colors.white),
+                    onPressed: () => _performSearch('search term'),
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
+        body: Center(
+          child: _isLoading
+              ? CircularProgressIndicator()
+              : SfPdfViewer.network(
+                  _presignedUrl!,
+                  controller: pdfViewerController,
+                  onPageChanged: (PdfPageChangedDetails details) {
+                    _updateLastViewedPage(details.newPageNumber);
+                  },
+                  onDocumentLoaded: (PdfDocumentLoadedDetails details) {
+                    setState(() {
+                      _totalPages = details.document.pages.count;
+                    });
+                    WidgetsBinding.instance.addPostFrameCallback((_) {
+                      if (pdfViewerController != null) {
+                        pdfViewerController.jumpToPage(widget.initialPage);
+                      }
+                    });
+                  },
+                  onDocumentLoadFailed: (PdfDocumentLoadFailedDetails details) {
+                    print('Document load failed: ${details.error}');
+                  },
+                ),
+        ),
       ),
     );
+  }
+
+  void _updateLastViewedPage(int pageNumber) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setInt('${widget.isbn}_last_viewed_page', pageNumber);
+    setState(() {
+      _currentPage = pageNumber - 1;
+    });
   }
 }

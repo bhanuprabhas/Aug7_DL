@@ -1,8 +1,10 @@
+import 'package:fllutter/screens/homeScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:fllutter/screens/library_screen.dart';
+
 
 class LoginForm extends StatefulWidget {
   @override
@@ -51,7 +53,7 @@ class _LoginFormState extends State<LoginForm> {
         // Navigate to LibraryScreen
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => LibraryScreen()),
+          MaterialPageRoute(builder: (context) => HomeScreen()),
         );
       } else {
         // Handle error response

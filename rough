@@ -69,7 +69,7 @@ class _LibraryScreenState extends State<LibraryScreen> {
   void updateSearchBarFocus(bool isFocused) {
     setState(() {
       if (!isFocused) {
-        isSearching = false;
+           = false;
       }
     });
   }
@@ -169,121 +169,731 @@ class _LibraryScreenState extends State<LibraryScreen> {
 
 
 
-//card inside styles for the allbooks and the topreads
+// //card inside styles for the allbooks and the topreads
 
 
-  Widget buildBookCard(dynamic book) {
-    return Card(
-      shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(0), // Adjust the border radius here
-    ),
-      margin: EdgeInsets.all(8),
-      color: Colors.white,
-      child: InkWell(
-        onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => BookDetailScreen(book: book),
-            ),
-          );
-        },
-        child: Container(
-          width: 120,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: <Widget>[
-              Expanded(
-                child: Container(
-                  decoration: BoxDecoration(
-                    image: book['coverPageURL'] != null
-                        ? DecorationImage(
-                            image: NetworkImage(book['coverPageURL']),
-                            fit: BoxFit.cover,
-                          )
-                        : null,
-                  ),
-                  child: book['coverPageURL'] == null
-                      ? Icon(Icons.book, size: 72, color: Colors.grey)
-                      : null,
-                ),
-              ),
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 5.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    Text(
-                      book['title'] ?? 'No Title',
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 10),
-                    ),
-                    SizedBox(height: 4),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
+//   Widget buildBookCard(dynamic book) {
+//     return Card(
+//       shape: RoundedRectangleBorder(
+//       borderRadius: BorderRadius.circular(0), // Adjust the border radius here
+//     ),
+//       margin: EdgeInsets.all(8),
+//       color: Colors.white,
+//       child: InkWell(
+//         onTap: () {
+//           Navigator.push(
+//             context,
+//             MaterialPageRoute(
+//               builder: (context) => BookDetailScreen(book: book),
+//             ),
+//           );
+//         },
+//         child: Container(
+//           width: 120,
+//           child: Column(
+//             crossAxisAlignment: CrossAxisAlignment.stretch,
+//             children: <Widget>[
+//               Expanded(
+//                 child: Container(
+//                   decoration: BoxDecoration(
+//                     image: book['coverPageURL'] != null
+//                         ? DecorationImage(
+//                             image: NetworkImage(book['coverPageURL']),
+//                             fit: BoxFit.cover,
+//                           )
+//                         : null,
+//                   ),
+//                   child: book['coverPageURL'] == null
+//                       ? Icon(Icons.book, size: 72, color: Colors.grey)
+//                       : null,
+//                 ),
+//               ),
+//               Padding(
+//                 padding: EdgeInsets.symmetric(horizontal: 5.0),
+//                 child: Column(
+//                   crossAxisAlignment: CrossAxisAlignment.start,
+//                   children: <Widget>[
+//                     Text(
+//                       book['title'] ?? 'No Title',
+//                       maxLines: 2,
+//                       overflow: TextOverflow.ellipsis,
+//                       style: TextStyle(fontWeight: FontWeight.bold, fontSize: 10),
+//                     ),
+//                     SizedBox(height: 4),
+//                   ],
+//                 ),
+//               ),
+//             ],
+//           ),
+//         ),
+//       ),
+//     );
+//   }
 
-  Widget buildTopReadCard(dynamic book) {
-    return Card(
-      shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(0), // Adjust the border radius here
-    ),
-      margin: EdgeInsets.all(8),
-      child: InkWell(
-        onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => BookDetailScreen(book: book),
-            ),
-          );
-        },
-        child: Container(
-          width: 120, // Adjust width as needed
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: <Widget>[
-              Expanded(
-                child: Container(
-                  decoration: BoxDecoration(
-                    image: book['coverPageURL'] != null
-                        ? DecorationImage(
-                            image: NetworkImage(book['coverPageURL']),
-                            fit: BoxFit.cover,
-                          )
-                        : null,
-                  ),
-                  child: book['coverPageURL'] == null
-                      ? Icon(Icons.book, size: 72, color: Colors.grey)
-                      : null,
-                ),
-              ),
-              Padding(
-                padding: EdgeInsets.all(8.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    Text(
-                      book['title'] ?? 'No Title',
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 10),
-                    ),
-                    SizedBox(height: 4),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
+//   Widget buildTopReadCard(dynamic book) {
+//     return Card(
+//       shape: RoundedRectangleBorder(
+//       borderRadius: BorderRadius.circular(0), // Adjust the border radius here
+//     ),
+//       margin: EdgeInsets.all(8),
+//       child: InkWell(
+//         onTap: () {
+//           Navigator.push(
+//             context,
+//             MaterialPageRoute(
+//               builder: (context) => BookDetailScreen(book: book),
+//             ),
+//           );
+//         },
+//         child: Container(
+//           width: 120, // Adjust width as needed
+//           child: Column(
+//             crossAxisAlignment: CrossAxisAlignment.stretch,
+//             children: <Widget>[
+//               Expanded(
+//                 child: Container(
+//                   decoration: BoxDecoration(
+//                     image: book['coverPageURL'] != null
+//                         ? DecorationImage(
+//                             image: NetworkImage(book['coverPageURL']),
+//                             fit: BoxFit.cover,
+//                           )
+//                         : null,
+//                   ),
+//                   child: book['coverPageURL'] == null
+//                       ? Icon(Icons.book, size: 72, color: Colors.grey)
+//                       : null,
+//                 ),
+//               ),
+//               Padding(
+//                 padding: EdgeInsets.all(8.0),
+//                 child: Column(
+//                   crossAxisAlignment: CrossAxisAlignment.start,
+//                   children: <Widget>[
+//                     Text(
+//                       book['title'] ?? 'No Title',
+//                       maxLines: 2,
+//                       overflow: TextOverflow.ellipsis,
+//                       style: TextStyle(fontWeight: FontWeight.bold, fontSize: 10),
+//                     ),
+//                     SizedBox(height: 4),
+//                   ],
+//                 ),
+//               ),
+//             ],
+//           ),
+//         ),
+//       ),
+//     );
+//   }
+// }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// animating white color on cards while hovering
+// AnimatedOpacity(
+                //   duration: Duration(milliseconds: 200),
+                //   opacity: isFocused ? 1.0 : 0.0, // Show popup only when focused
+                //   child: Container(
+                //     color: Colors.white.withOpacity(0.3),
+                //     alignment: Alignment.bottomCenter,
+                //     child: Text(
+                //       book['title'],
+                //       style: const TextStyle(
+                //         fontSize: 12.0,
+                //         fontWeight: FontWeight.bold,
+                //       ),
+                //     ),
+                //   ),
+                // ),
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// import 'package:fllutter/widgets/colors.dart';
+// import 'package:flutter/material.dart';
+// import 'package:http/http.dart' as http;
+// import 'dart:convert';
+
+// class HomeScreen extends StatefulWidget {
+//   @override
+//   _HomeScreenState createState() => _HomeScreenState();
+// }
+
+// class _HomeScreenState extends State<HomeScreen> {
+//   List<dynamic> books = [];
+//   List<dynamic> topReads = [];
+//   bool isLoadingBooks = true;
+//   bool isLoadingTopReads = true;
+//   int focusedBookIndex = -1;
+//   int focusedTopReadIndex = -1;
+//   int focusedSubjectIndex = -1;
+//   ScrollController _mainScrollController = ScrollController();
+//   ScrollController _booksController = ScrollController();
+//   ScrollController _topReadsController = ScrollController();
+//   Map<String, List<dynamic>> _subjectBooksMap = {};
+//   Map<String, ScrollController> _subjectScrollControllers = {};
+//   bool isBooksRowFocused = true;
+//   bool isTopReadsRowFocused = false;
+//   bool isSubjectRowFocused = false;
+//   String focusedSubject = '';
+
+//   @override
+//   void initState() {
+//     super.initState();
+//     fetchBooks();
+//     fetchTopReads();
+//   }
+
+//   Future<void> fetchBooks() async {
+//     try {
+//       final response = await http.get(
+//           Uri.parse('https://pl-api.iiit.ac.in/rcts/ETL-PE-003/info/allBooks'));
+//       if (response.statusCode == 200) {
+//         List<dynamic> fetchedBooks = json.decode(response.body);
+
+//         // Create a map to categorize books by subject
+//         Map<String, List<dynamic>> subjectBooksMap = {};
+
+//         for (var book in fetchedBooks) {
+//           String subject = book['subject'];
+
+//           if (subjectBooksMap.containsKey(subject)) {
+//             subjectBooksMap[subject]!.add(book);
+//           } else {
+//             subjectBooksMap[subject] = [book];
+//           }
+//         }
+
+//         // Initialize scroll controllers for each subject
+//         subjectBooksMap.keys.forEach((subject) {
+//           _subjectScrollControllers[subject] = ScrollController();
+//         });
+
+//         setState(() {
+//           books = fetchedBooks;
+//           isLoadingBooks = false;
+//           _subjectBooksMap = subjectBooksMap;
+//         });
+//       } else {
+//         throw Exception('Failed to load books');
+//       }
+//     } catch (e) {
+//       print('Error fetching books: $e');
+//       setState(() {
+//         isLoadingBooks = false;
+//       });
+//     }
+//   }
+
+//   Future<void> fetchTopReads() async {
+//     try {
+//       final response = await http.get(
+//           Uri.parse('https://pl-api.iiit.ac.in/rcts/ETL-PE-003/info/topReads'));
+//       if (response.statusCode == 200) {
+//         setState(() {
+//           topReads = json.decode(response.body);
+//           isLoadingTopReads = false;
+//         });
+//       } else {
+//         throw Exception('Failed to load top reads');
+//       }
+//     } catch (e) {
+//       print('Error fetching top reads: $e');
+//       setState(() {
+//         isLoadingTopReads = false;
+//       });
+//     }
+//   }
+
+//   void scrollLeft() {
+//     setState(() {
+//       if (isBooksRowFocused) {
+//         if (focusedBookIndex > 0) {
+//           focusedBookIndex--;
+//           _scrollToBook(focusedBookIndex);
+//         }
+//       } else if (isTopReadsRowFocused) {
+//         if (focusedTopReadIndex > 0) {
+//           focusedTopReadIndex--;
+//           _scrollToTopRead(focusedTopReadIndex);
+//         }
+//       } else if (isSubjectRowFocused) {
+//         if (_subjectBooksMap.containsKey(focusedSubject)) {
+//           if (focusedBookIndex > 0) {
+//             focusedBookIndex--;
+//             _scrollToSubjectBook(focusedSubject, focusedBookIndex);
+//           }
+//         }
+//       }
+//     });
+//   }
+
+//   void scrollRight() {
+//     setState(() {
+//       if (isBooksRowFocused) {
+//         if (focusedBookIndex < books.length - 1) {
+//           focusedBookIndex++;
+//           _scrollToBook(focusedBookIndex);
+//         }
+//       } else if (isTopReadsRowFocused) {
+//         if (focusedTopReadIndex < topReads.length - 1) {
+//           focusedTopReadIndex++;
+//           _scrollToTopRead(focusedTopReadIndex);
+//         }
+//       } else if (isSubjectRowFocused) {
+//         if (_subjectBooksMap.containsKey(focusedSubject)) {
+//           if (focusedBookIndex < _subjectBooksMap[focusedSubject]!.length - 1) {
+//             focusedBookIndex++;
+//             _scrollToSubjectBook(focusedSubject, focusedBookIndex);
+//           }
+//         }
+//       }
+//     });
+//   }
+
+//   void _scrollToBook(int index) {
+//     _booksController.animateTo(
+//       index * 150.0,
+//       duration: Duration(milliseconds: 500),
+//       curve: Curves.easeInOut,
+//     );
+//   }
+
+//   void _scrollToTopRead(int index) {
+//     _topReadsController.animateTo(
+//       index * 150.0,
+//       duration: Duration(milliseconds: 500),
+//       curve: Curves.easeInOut,
+//     );
+//   }
+
+//   void _scrollToSubjectBook(String subject, int index) {
+//     _subjectScrollControllers[subject]!.animateTo(
+//       index * 150.0,
+//       duration: Duration(milliseconds: 500),
+//       curve: Curves.easeInOut,
+//     );
+//   }
+
+//   void _scrollToFocusedSection(double offset) {
+//     _mainScrollController.animateTo(
+//       offset,
+//       duration: Duration(milliseconds: 500),
+//       curve: Curves.easeInOut,
+//     );
+//   }
+
+//   void handleKeyEvent(RawKeyEvent event) {
+//     if (event.runtimeType.toString() == 'RawKeyDownEvent') {
+//       switch (event.logicalKey.keyLabel) {
+//         case 'Arrow Left':
+//           scrollLeft();
+//           break;
+//         case 'Arrow Right':
+//           scrollRight();
+//           break;
+//         case 'Arrow Up':
+//           if (isSubjectRowFocused) {
+//             if (focusedSubjectIndex > 0) {
+//               setState(() {
+//                 focusedSubjectIndex--;
+//                 focusedSubject = _subjectBooksMap.keys.toList()[focusedSubjectIndex];
+//                 focusedBookIndex = 0;
+//                 _scrollToFocusedSection((focusedSubjectIndex + 1) * 230.0); // Adjust as necessary
+//               });
+//             } else {
+//               setState(() {
+//                 isSubjectRowFocused = false;
+//                 isTopReadsRowFocused = true;
+//                 focusedBookIndex = 0;
+//                 focusedSubject = '';
+//                 _scrollToFocusedSection(200.0); // Scroll to Top Reads
+//               });
+//             }
+//           } else if (isTopReadsRowFocused) {
+//             setState(() {
+//               isTopReadsRowFocused = false;
+//               isBooksRowFocused = true;
+//               focusedTopReadIndex = 0;
+//               _scrollToFocusedSection(0); // Scroll to All Books
+//             });
+//           }
+//           break;
+//         case 'Arrow Down':
+//           if (isBooksRowFocused) {
+//             setState(() {
+//               isBooksRowFocused = false;
+//               isTopReadsRowFocused = true;
+//               focusedBookIndex = 0;
+//               _scrollToFocusedSection(200.0); // Adjust as necessary
+//             });
+//           } else if (isTopReadsRowFocused) {
+//             setState(() {
+//               isTopReadsRowFocused = false;
+//               isSubjectRowFocused = true;
+//               focusedTopReadIndex = 0;
+//               focusedSubjectIndex = 0;
+//               focusedSubject = _subjectBooksMap.keys.toList()[focusedSubjectIndex];
+//               focusedBookIndex = 0;
+//               _scrollToFocusedSection((focusedSubjectIndex + 1) * 200.0); // Adjust as necessary
+//             });
+//           } else if (isSubjectRowFocused) {
+//             if (focusedSubjectIndex < _subjectBooksMap.keys.length - 1) {
+//               setState(() {
+//                 focusedSubjectIndex++;
+//                 focusedSubject = _subjectBooksMap.keys.toList()[focusedSubjectIndex];
+//                 focusedBookIndex = 0;
+//                 _scrollToFocusedSection((focusedSubjectIndex + 1) * 250.0); // Adjust as necessary
+//               });
+//             }
+//           }
+//           break;
+//       }
+//     }
+//   }
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       backgroundColor: AppColors.backgroundColor,
+//       appBar: AppBar(
+//         backgroundColor: AppColors.backgroundColor,
+//         title: const Text(
+//           'Digital Library @RCTS',
+//           style: TextStyle(color: AppColors.textColor),
+//         ),
+//       ),
+//       body: RawKeyboardListener(
+//         focusNode: FocusNode(),
+//         onKey: handleKeyEvent,
+//         autofocus: true,
+//         child: SingleChildScrollView(
+//           controller: _mainScrollController,
+//           child: Column(
+//             crossAxisAlignment: CrossAxisAlignment.start,
+//             children: [
+//               // All Books Section
+//               isLoadingBooks
+//                   ? Center(child: CircularProgressIndicator())
+//                   : Container(
+//                       decoration: BoxDecoration(
+//                         color: isBooksRowFocused
+//                             ? Colors.grey[800]
+//                             : Colors.transparent,
+//                       ),
+//                       child: Column(
+//                         crossAxisAlignment: CrossAxisAlignment.start,
+//                         children: [
+//                           const Padding(
+//                             padding: EdgeInsets.all(8.0),
+//                             child: Text(
+//                               'All Books',
+//                               style: TextStyle(
+//                                 color: AppColors.textColor,
+//                                 fontSize: 20.0,
+//                                 fontWeight: FontWeight.bold,
+//                               ),
+//                             ),
+//                           ),
+//                           Container(
+//                             height: 150.0,
+//                             child: ListView.builder(
+//                               controller: _booksController,
+//                               scrollDirection: Axis.horizontal,
+//                               itemCount: books.length,
+//                               itemBuilder: (context, index) {
+//                                 return GestureDetector(
+//                                   onTap: () {
+//                                     setState(() {
+//                                       focusedBookIndex = index;
+//                                       focusedTopReadIndex = -1;
+//                                       focusedSubject = '';
+//                                       isBooksRowFocused = true;
+//                                       isTopReadsRowFocused = false;
+//                                       isSubjectRowFocused = false;
+//                                     });
+//                                   },
+//                                   child: _buildBookCard(
+//                                     books[index],
+//                                     index == focusedBookIndex &&
+//                                         isBooksRowFocused,
+//                                   ),
+//                                 );
+//                               },
+//                             ),
+//                           ),
+//                         ],
+//                       ),
+//                     ),
+//               SizedBox(height: 20),
+
+//               // Top Reads Section
+//               Container(
+//                 decoration: BoxDecoration(
+//                   color: isTopReadsRowFocused
+//                       ? Colors.grey[800]
+//                       : Colors.transparent,
+//                 ),
+//                 child: Column(
+//                   crossAxisAlignment: CrossAxisAlignment.start,
+//                   children: [
+//                     const Padding(
+//                       padding: EdgeInsets.all(8.0),
+//                       child: Text(
+//                         'Top Reads',
+//                         style: TextStyle(
+//                           color: AppColors.textColor,
+//                           fontSize: 20.0,
+//                           fontWeight: FontWeight.bold,
+//                         ),
+//                       ),
+//                     ),
+//                     isLoadingTopReads
+//                         ? Center(child: CircularProgressIndicator())
+//                         : Container(
+//                             height: 150.0,
+//                             child: ListView.builder(
+//                               controller: _topReadsController,
+//                               scrollDirection: Axis.horizontal,
+//                               itemCount: topReads.length,
+//                               itemBuilder: (context, index) {
+//                                 return GestureDetector(
+//                                   onTap: () {
+//                                     setState(() {
+//                                       focusedTopReadIndex = index;
+//                                       focusedBookIndex = -1;
+//                                       focusedSubject = '';
+//                                       isBooksRowFocused = false;
+//                                       isTopReadsRowFocused = true;
+//                                       isSubjectRowFocused = false;
+//                                     });
+//                                   },
+//                                   child: _buildTopReadsCard(
+//                                     topReads[index],
+//                                     index == focusedTopReadIndex &&
+//                                         isTopReadsRowFocused,
+//                                   ),
+//                                 );
+//                               },
+//                             ),
+//                           ),
+//                   ],
+//                 ),
+//               ),
+
+//               SizedBox(height: 20),
+
+//               // Books Sections for each subject
+//               if (_subjectBooksMap.isEmpty)
+//                 const Center(child: Text('No books available',style: TextStyle(color: AppColors.textColor)))
+//               else
+//                 ..._subjectBooksMap.entries.map((entry) {
+//                   String subject = entry.key;
+//                   List<dynamic> booksList = entry.value;
+//                   bool isFocusedSubject =
+//                       _subjectBooksMap.keys.toList().indexOf(subject) == focusedSubjectIndex;
+//                   return Container(
+//                     padding: EdgeInsets.symmetric(vertical: 10.0),
+//                     color: isFocusedSubject && isSubjectRowFocused
+//                         ?  Colors.grey[800]
+//                         : Colors.transparent,
+//                     child: Column(
+//                       crossAxisAlignment: CrossAxisAlignment.start,
+//                       children: [
+//                         Padding(
+//                           padding: EdgeInsets.all(8.0),
+//                           child: Text(
+//                             subject,
+//                             style: TextStyle(
+//                               color: AppColors.textColor,
+//                               fontSize: 20.0,
+//                               fontWeight: FontWeight.bold,
+//                             ),
+//                           ),
+//                         ),
+//                         Container(
+//                           height: 150.0,
+//                           child: ListView.builder(
+//                             controller: _subjectScrollControllers[subject],
+//                             scrollDirection: Axis.horizontal,
+//                             itemCount: booksList.length,
+//                             itemBuilder: (context, index) {
+//                               return GestureDetector(
+//                                 onTap: () {
+//                                   setState(() {
+//                                     focusedSubject = subject;
+//                                     focusedBookIndex = index;
+//                                     isBooksRowFocused = false;
+//                                     isTopReadsRowFocused = false;
+//                                     isSubjectRowFocused = true;
+//                                   });
+//                                 },
+//                                 child: _buildBookCard(
+//                                   booksList[index],
+//                                   index == focusedBookIndex &&
+//                                       isFocusedSubject && isSubjectRowFocused,
+//                                 ),
+//                               );
+//                             },
+//                           ),
+//                         ),
+//                       ],
+//                     ),
+//                   );
+//                 }).toList(),
+//             ],
+//           ),
+//         ),
+//       ),
+//     );
+//   }
+
+//   Widget _buildBookCard(Map<String, dynamic> book, bool isFocused) {
+//     double scaleFactor =
+//         isFocused ? 1.0 : 0.95; // Scale factor for focused item
+//     Color borderColor = isFocused
+//         ? Colors.red
+//         : Colors.transparent; // Border color based on focus
+
+//     return Padding(
+//       padding: const EdgeInsets.all(10.0),
+//       child: SizedBox(
+//         width: 140.0, // Width of each book card
+//         height: 140.0, // Height of each book card
+//         child: GestureDetector(
+//           onTap: () {
+//             // Handle tap on book item
+//             print('Tapped on ${book['title']}');
+//           },
+//           child: AnimatedContainer(
+//             duration: Duration(milliseconds: 300), // Animation duration
+//             transform: Matrix4.identity()..scale(scaleFactor), // Apply scaling
+//             decoration: BoxDecoration(
+//               border: Border.all(color: borderColor, width: 4.0),
+//               borderRadius: BorderRadius.circular(2.0),
+//               color: Colors.white,
+//               boxShadow: [
+//                 if (isFocused)
+//                   BoxShadow(
+//                     color: Colors.grey.withOpacity(0.5),
+//                     spreadRadius: 2,
+//                     blurRadius: 5,
+//                   ),
+//               ],
+//             ),
+//             child: Column(
+//               crossAxisAlignment: CrossAxisAlignment.start,
+//               children: [
+//                 Expanded(
+//                   child: Image.network(
+//                     book['coverPageURL'],
+//                     fit: BoxFit.cover,
+//                     width: double.infinity,
+//                   ),
+//                 ),
+//                 Padding(
+//                   padding: const EdgeInsets.all(4.0),
+//                   child: Text(
+//                     book['title'],
+//                     style: const TextStyle(
+//                       fontSize: 10.0,
+//                       color: Colors.black,
+//                     ),
+//                   ),
+//                 ),
+//               ],
+//             ),
+//           ),
+//         ),
+//       ),
+//     );
+//   }
+
+//   Widget _buildTopReadsCard(Map<String, dynamic> topRead, bool isFocused) {
+//     double scaleFactor =
+//         isFocused ? 1.0 : 0.95; // Scale factor for focused item
+//     Color borderColor = isFocused
+//         ? Colors.red
+//         : Colors.transparent; // Border color based on focus
+
+//     return Padding(
+//       padding: const EdgeInsets.all(6.0),
+//       child: SizedBox(
+//         width: 140.0, // Width of each top reads card
+//         height: 140.0, // Height of each top reads card
+//         child: GestureDetector(
+//           onTap: () {
+//             // Handle tap on top reads item
+//             print('Tapped on ${topRead['title']}');
+//           },
+//           child: AnimatedContainer(
+//             duration: Duration(milliseconds: 300), // Animation duration
+//             transform: Matrix4.identity()..scale(scaleFactor), // Apply scaling
+//             decoration: BoxDecoration(
+//               border: Border.all(color: borderColor, width: 4.0),
+//               borderRadius: BorderRadius.circular(2.0),
+//               color: Colors.white,
+//               boxShadow: [
+//                 if (isFocused)
+//                   BoxShadow(
+//                     color: Colors.grey.withOpacity(0.5),
+//                     spreadRadius: 2,
+//                     blurRadius: 5,
+//                   ),
+//               ],
+//             ),
+//             child: Column(
+//               crossAxisAlignment: CrossAxisAlignment.start,
+//               children: [
+//                 Expanded(
+//                   child: Image.network(
+//                     topRead['coverPageURL'],
+//                     fit: BoxFit.cover,
+//                     width: double.infinity,
+//                   ),
+//                 ),
+//                 Padding(
+//                   padding: const EdgeInsets.all(8.0),
+//                   child: Text(
+//                     topRead['title'],
+//                     style: TextStyle(
+//                       fontSize: 10.0,
+//                       color: Colors.black,
+//                     ),
+//                   ),
+//                 ),
+//               ],
+//             ),
+//           ),
+//         ),
+//       ),
+//     );
+//   }
+// }
